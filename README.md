@@ -1,15 +1,15 @@
-# SmartCampus
+# Smart Campus
 
 **Part 1: Service Architecture & Setup**
 
 **Project & Application Configuration:**
-The default lifecycle of a JAX-RS resource class is determined by when a request is made. This means a new instance of the resource class is instantiated for every incoming request, rather than being treated as a singleton that serves all requests. Since each request creates a new instance, instance variables cannot be used to persist data across multiple requests because they would be lost when the request ends. Therefore, to maintain data across the entire application, I declared my data storage maps as public static variables, which are shared among all instances of the resource class. 
-Additionally, to take into consideration the chance of multiple requests arriving simultaneously and accessing the same static maps concurrently, I used ConcurrentHashMap instead of a regular HashMap. ConcurrentHashMap prevents data loss when multiple users access the API at the same time, unlike a regular HashMap which could crash or corrupt data during simultaneous requests.
+The default lifecycle of a JAX-RS resource class is determined by when a request is made. This means a new instance of the resource class is instantiated for every incoming request, rather than being treated as a singleton that serves all requests. Since each request creates a new instance, instance variables can't be used to store data across multiple requests because they would be lost when the request ends. Therefore, to maintain data across the entire application, I made my data storage maps as public static variables, which are shared among all instances of the resource class. 
+I also used ConcurrentHashMap instead of a regular HashMap, to take into consideration the chance of multiple requests arriving simultaneously. ConcurrentHashMap prevents data loss when multiple users access the API at the same time, unlike a regular HashMap which could crash or corrupt data during simultaneous requests.
 
 **The ”Discovery” Endpoint :**
-HATEOAS is considered a hallmark of advanced RESTful design because it makes the API self-discoverable. Instead of clients needing to know all endpoint URLs in advance, the API provides relevant links within each response, telling the client what actions they can take next. This follows the original REST principle that a client should only need a starting URL and then discover all other resources through hyperlinks, similar to how humans navigate a website by clicking links rather than memorising URLs.
+HATEOAS makes the API self-discoverable, instead of clients needing to know all endpoint URLs in advance. The API provides relevant links within each response, telling the client what actions they can take next. This follows the original REST principle that a client would only need a starting URL and then discover all other resources through hyperlinks.
 
-HATEOAS provides several benefits over static documentation. First, it reduces coupling between the client and server because clients do not hardcode URLs - they follow links provided in responses. Second, if the server changes its URL structure, the client continues working as long as the link relationships (like "next" or "delete") remain the same. Third, it guides developers naturally through the API workflow by showing available actions at each step. With static documentation, developers constantly look up URLs and manually construct requests, which is error-prone. With HATEOAS, the API itself tells the client what to do next, making integration faster and more reliable.
+HATEOAS reduces how dependent different parts of a system are on each other, between the client and server as clients do not hardcode URLs. Also, if the server changes its URL structure, the client continues working as long as the link relationships remain the same. With HATEOAS, the API itself tells the client what to do next, making integration faster and more reliable.
 
 
 **Part 2: Room Management**
@@ -17,6 +17,7 @@ HATEOAS provides several benefits over static documentation. First, it reduces c
 **Room Resource Implementation:**
 When you return a list of rooms, sending only the IDs uses less data and is faster, but the client has to do extra work to get the full details. Sending full room objects gives all the information right away, but it uses more bandwidth and can be slower.
 Returning full room objects consumes more network bandwidth because each response includes all fields (id, name, capacity, sensorIds) for every room. However, this approach reduces client-side processing because the client receives all the data it needs in a single request and can display it immediately without making additional API calls.
+
 Returning only IDs uses significantly less network bandwidth since only a small identifier is sent per room. This is more efficient for large datasets and slow network connections. However, the client would then need to make a separate GET /rooms/{id} request for each room to retrieve the full details. 
 
 **Room Deletion & Safety Logic**
