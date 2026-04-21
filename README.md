@@ -52,3 +52,32 @@ My GlobalExceptionMapper  catches all unexpected exceptions and returns only a g
 
 **API Request & Response Logging Filters**
 Using JAX-RS filters for logging is better than manually adding Logger.info() in every resource method because it avoids code duplication and keeps the code clean. Instead of repeating logging statements in each method, you write the logging logic once in a filter, and it automatically applies to all incoming requests and outgoing responses. This makes the code easier to maintain since any change to the logging format only needs to be done in one place. It also ensures consistent logging across the entire application and prevents mistakes like forgetting to add logs in some methods. As a result, resource classes stay focused on business logic only, improving readability and following good separation of concerns.
+
+
+
+**Curl Commands**
+
+**API Discovery (GET)**
+GET http://localhost:8080/SmartCampus/api/v1/
+
+
+**Create a Room (POST)**
+POST http://localhost:8080/SmartCampus/api/v1/rooms/
+{
+    "id": "LIB-301",
+    "name": "Library Quiet Study",
+    "capacity": 50
+}
+
+**Get All Rooms (GET)**
+GET http://localhost:8080/SmartCampus/api/v1/rooms
+{
+    "id":"LIB-301",
+    "name":"Library Quiet Study",
+    "capacity":50
+  }
+
+**Add Another Reading (POST)**
+POST http://localhost:8080/SmartCampus/api/v1/sensors/TEMP-001/readings 
+"Content-Type: application/json" 
+'{"value":24.1}'
