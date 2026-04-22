@@ -1,12 +1,19 @@
 # Smart Campus
 
+**API Overview**
+My Smart Campus API is a RESTful web service that lets managers create and manage rooms and sensors across a university campus. The API includes features like creating rooms, adding sensors to specific rooms, filtering sensors by type, keeping a history of sensor readings, and preventing users from deleting a room if it still has active sensors inside it. The API also returns helpful error messages with the correct HTTP status codes, such as 409 and 422. The base URL for the API is http://localhost:8080/SmartCampus/api/v1/.
+
+**Build and Launch Instructions**
+To build and run the Smart Campus API, first open the project in NetBeans IDE. Right-click on the project name and select Clean and Build to compile the code. After the build is successful, right-click the project again and select Run. This will deploy the API to the Tomcat server and start it. Wait for the console to say "Server started", which means the API is now running. To test if it works, open Postman or your browser and go to http://localhost:8080/SmartCampus/api/v1/. You should see a JSON response with the API version and links to rooms and sensors. 
+
+
 **Part 1: Service Architecture & Setup**
 
 **Project & Application Configuration:**
 The default lifecycle of a JAX-RS resource class is determined by when a request is made. This means a new instance of the resource class is instantiated for every incoming request, rather than being treated as a singleton that serves all requests. Since each request creates a new instance, instance variables can't be used to store data across multiple requests because they would be lost when the request ends. Therefore, to maintain data across the entire application, I made my data storage maps as public static variables, which are shared among all instances of the resource class. 
 I also used ConcurrentHashMap instead of a regular HashMap, to take into consideration the chance of multiple requests arriving simultaneously. ConcurrentHashMap prevents data loss when multiple users access the API at the same time, unlike a regular HashMap which could crash or corrupt data during simultaneous requests.
 
-**The ”Discovery” Endpoint :**
+**The ”Discovery” Endpoint:**
 HATEOAS makes the API self-discoverable, instead of clients needing to know all endpoint URLs in advance. The API provides relevant links within each response, telling the client what actions they can take next. This follows the original REST principle that a client would only need a starting URL and then discover all other resources through hyperlinks.
 
 HATEOAS reduces how dependent different parts of a system are on each other, between the client and server as clients do not hardcode URLs. Also, if the server changes its URL structure, the client continues working as long as the link relationships remain the same. With HATEOAS, the API itself tells the client what to do next, making integration faster and more reliable.
@@ -57,6 +64,9 @@ Using JAX-RS filters for logging is better than manually adding Logger.info() in
 
 **Curl Commands**
 
+**Discovery Endpoint (GET)**
+GET http://localhost:8080/SmartCampus
+
 **API Discovery (GET)**
 GET http://localhost:8080/SmartCampus/api/v1/
 
@@ -69,6 +79,16 @@ POST http://localhost:8080/SmartCampus/api/v1/rooms/
     "capacity": 50
 }
 
+**Create a sensor (POST)**
+POST http://localhost:8080/SmartCampus/api/v1/sensors
+{
+    "id": "TEMP-001",
+    "type": "Temperature",
+    "status": "ACTIVE",
+    "currentValue": 22.5,
+    "roomId": "LIB-301"
+}
+
 **Get All Rooms (GET)**
 GET http://localhost:8080/SmartCampus/api/v1/rooms
 {
@@ -77,7 +97,11 @@ GET http://localhost:8080/SmartCampus/api/v1/rooms
     "capacity":50
   }
 
-**Add Another Reading (POST)**
-POST http://localhost:8080/SmartCampus/api/v1/sensors/TEMP-001/readings 
-"Content-Type: application/json" 
-'{"value":24.1}'
+
+**Delete sensor (DELETE)**
+DELETE http://localhost:8080/SmartCampus/api/v1/sensors/TEMP-001
+204 No content
+
+
+
+
